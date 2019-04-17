@@ -121,7 +121,7 @@ authentication mechanisms. Often, the entity accessing these APIs is a
 piece of automated software outside of an interactive human session. While
 there are mechanisms like OAuth and API secrets that are used to grant
 API access, each have their weaknesses such as unnecessary complexity
-for particular use cases or the use of shared secrets which may not be
+for particular use cases or the use of shared secrets which might not be
 acceptable to an implementer.
    </t>
    <t>
@@ -179,7 +179,7 @@ of keys and assignment of `keyId` is out of scope for this document.
      <t>
 RECOMMENDED.  The `date` field is an integer representing a Unix time. Represent the
 signature issuing timestamp. A signature generated after the current timestamp
-should not be processed. Using Unix timestamp avoids speeds up processing and
+SHOULD NOT be processed. Using Unix timestamp avoids speeds up processing and
 avoid timezone management existing in RFC3339. Subsecond precision is allowed
 using decimal notation.
      </t>
@@ -189,7 +189,7 @@ using decimal notation.
      <t>
 OPTIONAL.  The `expires` field is an integer representing a Unix time. Represents
 the signature end of validity. A signature expired after the current timestamp
-should not be processed. Using Unix timestamp avoids speeds up processing and
+SHOULD NOT be processed. Using Unix timestamp avoids speeds up processing and
 avoid timezone management existing in RFC3339. Subsecod precision is allowed
 using decimal notation.
      </t>
@@ -213,7 +213,7 @@ The `signature` parameter is then set to the base 64 encoding of the signature.
      <t>
 OPTIONAL.  The `headers` parameter is used to specify the list of HTTP headers
 included when generating the signature for the message.  If specified, it
-should be a lowercased, quoted list of HTTP header fields, separated by a
+MUST be a lowercased, quoted list of HTTP header fields, separated by a
 single space character. If not specified, implementations MUST operate as if
 the field were specified with a single value, the `Date` header, in the list
 of HTTP headers. Note that the list order is important, and MUST be specified in
@@ -234,7 +234,7 @@ marked "deprecated". It is preferred that the algorithm used by an
 implementation be derived from the key metadata identified by the `keyId`
 rather than from this field. If `algorithm` is provided and differs from
 the key metadata identified by the `keyId` then an implementation
-MUST produce an error. The `algorithm` parameter, which may be specified by
+MUST produce an error. The `algorithm` parameter, which might be altered by
 an attacker, has the potential to create security vulnerabilities and
 will most likely be deprecated in the future.
      </t>
@@ -327,7 +327,7 @@ x-example: Example header with some whitespace.
         <t>
 If you want to add an optiona date or expires to the signature, you
 can use the `(date)` and the `(expire)` special headers. In this case, the signature
-should include them:
+MUST include them:
 
     <figure>
      <artwork>
@@ -374,8 +374,8 @@ signature string hashing function is SHA-256, and the signing
 algorithm is the one defined in <xref target="RFC3447">RFC 3447</xref>,
 Section <eref target="http://tools.ietf.org/html/rfc3447#section-8.2.1">
 Section 8.2.1</eref>. The result of the signature creation algorithm
-specified in <xref target="RFC3447">RFC 3447</xref> should result in a
-binary string, which is then base 64 encoded and placed into the
+specified in <xref target="RFC3447">RFC 3447</xref> is a
+binary string, which is then base64 encoded and placed into the
 `signature` value.
    </t>
 
@@ -409,7 +409,7 @@ verification algorithm to use to verify the signature is the one defined in
 <xref target="RFC3447">RFC 3447</xref>, Section <eref
 target="http://tools.ietf.org/html/rfc3447#section-8.2.2">
 Section 8.2.2</eref>. The result of the signature verification algorithm
-specified in <xref target="RFC3447">RFC 3447</xref> should result in a
+specified in <xref target="RFC3447">RFC 3447</xref> is a
 successful verification unless the headers protected by the signature were
 tampered with in transit.
    </t>
@@ -471,10 +471,10 @@ The "hmac-key-1" keyId refers to key known to the client and server.
    <section anchor="auth-isa" title="Initiating Signature Authorization">
 
     <t>
-A server may notify a client when a protected resource could be accessed by
+A server MAY notify a client when a protected resource could be accessed by
 authenticating itself to the server. To initiate this process, the server
 will request that the client authenticate itself via a 401 response code. The
-server may optionally specify which HTTP headers it expects to be signed
+server MAY optionally specify which HTTP headers it expects to be signed
 by specifying the `headers` parameter in the WWW-Authenticate header.
 For example:
     <figure>
