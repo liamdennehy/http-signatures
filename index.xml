@@ -138,16 +138,18 @@ digitally signing HTTP messages.
 This specification presents two mechanisms with distinct purposes:
     <list style="numbers">
        <t>
-The "Signature" scheme which is intended primarily to allow a sender
-to assert the contents of the message sent are correct and have not been
-altered during transmission or storage in a way that alters the meaning expressed
-in the original message as signed. Any party reading the message (the verifier)
-may independently confirm the validity of the message signature. This scheme
+The "Signature" scheme is intended primarily to allow a HTTP client
+or server (the signer) to associate a digital signature of selected elements of
+the message and transmit that signature within the message.
+Any party reading the message (the verifier) can independently confirm
+the validity of the signature, and determine whether the message has been
+altered during transmission or storage in a way that alters the meaning
+expressed by the signer. This scheme
 is agnostic to the client/server direction and can be used to verify the contents of
-either HTTP requests, HTTP reponses, or both.
+either the HTTP request, the HTTP reponse, or both.
        </t>
        <t>
-The "Authorization" scheme which is intended primarily to allow a sender
+The "Authorization" scheme is intended primarily to allow a sender
 to request access to a resource or resources by proving that they control a
 secret key. This specification allows for this both with a shared secret
 (using HMAC) or with public/private keys. The "Authorization" scheme is
@@ -159,7 +161,7 @@ the HTTP server.
      </list>
   </t>
 
-  <section anchor="intro-requests" title="Using Signatures in HTTP Messages">
+  <section anchor="intro-signatures" title="Using Signatures in HTTP Messages">
    <t>
 It is common practice to protect sensitive website and API functionality via
 authentication mechanisms. Often, the entity accessing these APIs is a
@@ -175,32 +177,29 @@ for this at all.
 Digital signatures are widely used to provide authentication and integrity
 assurances without
 the need for shared secrets. They also do not require a round-trip in
-order to authenticate the signing party, and allow the integrity of a message to
+order to authenticate the signing party, allow the integrity of a message to
 be verified independently of the transport (e.g. TLS).
 A verifier need only have an understanding of the key (e.g. through
 a mapping between
 the key being used to sign the content and the authorized entity) to
-verify that a message was signed by that signing.
+verify that a message was signed by that signing entity.
+   </t>
+   <t>
+HTTP messages are routinely altered as they traverse the infrastructure of the
+Internet, for mostly benign reasons. Gateways and proxies add, remove and
+alter headers for operational reasons, so a sender cannot rely on the
+recipient receiving exactly the message transmitted.
+By allowing a sender to sign specified headers, the recipient and
+intermediate system can confirm that the original intent of the sender
+is preserved; including a Digest header can also verify the message
+body is not modified. This allows any recipient to easily confirm both
+the sender's identity, and detect any incidental or malicious changes that alter
+the content or meaning of the message.
    </t>
    <t>
 When optionally combined with asymmetric keys associated with an
 identity, this specification can also enable authentication of a client and
 server with or without prior knowledge of each other.
-   </t>
-  </section>
-
-  <section anchor="intro-responses" title="Using Signatures in HTTP Responses">
-   <t>
-HTTP messages are routinely altered as they traverse the infrastrcture of the
-Internet, for mostly benign reasons. Gateways and proxies add, remove and
-alter headers for operational reasons, so a sender cannot rely on the
-recipient receiving exactly the message transmitted.
-By allowing a sender to sign specified headers, and recipient or
-intermediate system can confirm that the original intent of the sender
-is preserved, and including a Digest header can also verify the message
-body is not modified. This allows any recipient to easily confirm both
-the sender's identity, and any incidental or malicious changes that alter
-the content or meaning of the message.
    </t>
   </section>
 
@@ -210,7 +209,7 @@ the content or meaning of the message.
   <t>
 There are a number of components in a signature that are common between the
 'Signature' HTTP Authentication Scheme and the 'Signature' HTTP Header. This
-section details the components of the digital signature paremeters common to
+section details the components of the digital signature parameters common to
 both schemes.
   </t>
 
@@ -324,8 +323,9 @@ MUST be ignored.
 
    <t>
 A signed HTTP message needs to be tolerant of some trivial
-alterations during transmission
-as it goes through gateways, proxies, and other entities. These changes are often
+alterations during transmission as it goes through transmission
+<eref target="https://tools.ietf.org/html/rfc7230#section-2.3">intermediaries</eref>
+(proxies, gateways and tunnels). These changes are often
 of little consequence and very benign, but also often not visible to or
 detectable by either the sender or the recipient. Simply signing the entire
 message that was transmitted by the sender is therefore not feasible:
@@ -760,8 +760,8 @@ The signer would compose the signing string as:
     <figure>
      <artwork>
 (request-target): post /foo\n
-(created): 1402170695
-(expires): 1402170995
+(created): 1402170695\n
+(expires): 1402170995\n
 host: example.org\n
 digest: SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=\n
 content-length: 18</artwork>
