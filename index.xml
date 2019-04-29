@@ -83,7 +83,7 @@ should be aware that a number of new features have been introduced in
 this version that change previous algorithms in subtle but important ways.
 Namely, there is now a backwards-compatible way to modify the signature
 string construction algorithm, as well as two new Signature Parameters to
-enable web browser-based clients to include a signature creation and expiration
+enable implementations to include a signature creation and expiration
 timestamp. The new features are designed to be fully backwards compatible.
 Older features have been deprecated, but are still supported in the algorithms
 described by this specification. There are no plans to remove deprecated
@@ -109,7 +109,7 @@ or be sent to
  <section anchor="intro" title="Introduction">
   <t>
 This protocol extension is intended to provide a simple and standard way for
-clients to sign HTTP messages.
+clients and servers to sign HTTP messages.
   </t>
 
   <t>
@@ -159,14 +159,14 @@ the HTTP server.
      </list>
   </t>
 
-  <section anchor="intro-requests" title="Using Signatures in HTTP Requests">
+  <section anchor="intro-requests" title="Using Signatures in HTTP Messages">
    <t>
 It is common practice to protect sensitive website and API functionality via
 authentication mechanisms. Often, the entity accessing these APIs is a
 piece of automated software outside of an interactive human session. While
 there are mechanisms like OAuth and API secrets that are used to grant
 API access, each have their weaknesses such as unnecessary complexity
-for particular use cases or the use of shared secrets which may not be
+for particular use cases or the use of shared secrets which might not be
 acceptable to an implementer. Shared secrets also prohibit any possibility
 for non-repudiation, while secure transports such as TLS do not provide
 for this at all.
@@ -175,12 +175,12 @@ for this at all.
 Digital signatures are widely used to provide authentication and integrity
 assurances without
 the need for shared secrets. They also do not require a round-trip in
-order to authenticate the client, and allow the integrity of a message to
+order to authenticate the signing party, and allow the integrity of a message to
 be verified independently of the transport (e.g. TLS).
-A server need only have an understanding of the key (e.g. through
+A verifier need only have an understanding of the key (e.g. through
 a mapping between
 the key being used to sign the content and the authorized entity) to
-verify that a message was signed by that entity.
+verify that a message was signed by that signing.
    </t>
    <t>
 When optionally combined with asymmetric keys associated with an
@@ -222,7 +222,7 @@ The following section details the Signature Parameters.
 
     <section anchor="keyId" title="keyId">
      <t>
-REQUIRED. The `keyId` field is an opaque string that the server can use to look
+REQUIRED. The `keyId` field is an opaque string that the verifier can use to look
 up the component they need to validate the signature. It could be an SSH key
 fingerprint, a URL to machine-readable key data, an LDAP DN, etc. Management
 of keys and assignment of `keyId` is out of scope for this document.
@@ -237,7 +237,7 @@ employ when creating or verifying signatures.
 REQUIRED.  The `signature` parameter is a base 64 encoded digital signature,
 as described in <xref target="RFC4648">RFC 4648</xref>,
 <eref target="https://tools.ietf.org/html/rfc4648#section-4">Section 4</eref>.
-The client uses the `algorithm` and `headers` Signature Parameters to form a
+The signer uses the `algorithm` and `headers` Signature Parameters to form a
 canonicalized `signing string`.  This `signing string` is then signed with the
 key associated with `keyId` and the algorithm corresponding to `algorithm`.
 The `signature` parameter is then set to the base 64 encoding of the signature.
@@ -338,13 +338,13 @@ appearing in this parameter are then used to construct the intermediate
 Signature String, which is the data that is actually signed.
    </t>
    <t>
-In order to generate the string that is signed with a key, the client MUST use
+In order to generate the string that is signed with a key, the signer MUST use
 the values of each HTTP header field in the `headers` Signature Parameter,
 in the order they appear in the `headers` Signature Parameter. It is out of
-scope for this document to dictate what header fields
+scope for this document to dictate which header fields
 an application will want to enforce, but implementers SHOULD at minimum
-include the `(request-target)` and `(created)` header fields if `algorithm` does
-not start with `rsa`, `hmac`, or `ecdsa`. Otherwise, `(request-target)` and
+include the `(request-target)` and `(created)` pseudo-header fields if `algorithm`
+does not start with `rsa`, `hmac`, or `ecdsa`. Otherwise, `(request-target)` and
 `date` SHOULD be included in the signature.
    </t>
    <t>
@@ -453,7 +453,7 @@ x-example: Example header with some whitespace.
   <section anchor="create" title="Creating a Signature">
 
    <t>
-In order to create a signature, a client MUST:
+In order to create a signature, a signer MUST:
     <list style="numbers">
      <t>
 Use the `headers` and `algorithm` values as well as the contents of the HTTP
@@ -490,7 +490,7 @@ binary string, which is then base 64 encoded and placed into the
   <section anchor="verify" title="Verifying a Signature">
 
    <t>
-In order to verify a signature, a server MUST:
+In order to verify a signature, a verifier MUST:
     <list style="numbers">
      <t>
 Use the received HTTP message, the `headers` value, and the
@@ -579,7 +579,7 @@ target="https://tools.ietf.org/html/rfc3230#section-4.3.2">Section 4.3.2</eref>
 and is included merely as a demonstration of how an implementer could include
 information about the body of the message in the signature.
 The following sections also assume that the "rsa-key-1" keyId asserted by the
-client is an identifier meaningful to the server.
+client is an identifier meaningful to the verifier.
    </t>
 
    <section anchor="auth-isa" title="Initiating Signature Authorization">
@@ -738,7 +738,7 @@ Content-Length: 18
 
    <t>
 The following sections assume that the "rsa-key-1" keyId provided by the
-signer is an identifier meaningful to the server.
+signer is an identifier meaningful to the verifier.
    </t>
 
    <section anchor="sig-rsa-example" title="RSA Example">
@@ -756,7 +756,7 @@ Signature: keyId="rsa-key-1",algorithm="hs2019",
    </t>
 
    <t>
-The client would compose the signing string as:
+The signer would compose the signing string as:
     <figure>
      <artwork>
 (request-target): post /foo\n
@@ -799,12 +799,12 @@ Signature: keyId="hmac-key-1",algorithm="hs2019",created=1402170695,
 
    <t>
 The only difference between the RSA Example and the HMAC Example is the
-signature algorithm that is used. The client would compose the signing string
+signature algorithm that is used. The signer would compose the signing string
 in the same way as the RSA Example above:
     <figure>
      <artwork>
 (request-target): post /foo\n
-(created): 1402170695
+(created): 1402170695\n
 host: example.org\n
 digest: SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=\n
 content-length: 18
@@ -1088,8 +1088,10 @@ https://www.iana.org/assignments/http-authschemes</eref>
    <t>
 Authentication Scheme Name: Signature<vspace/>
 Reference: [RFC_THIS_DOCUMENT], Section 2.<vspace/>
-Notes (optional): The Signature scheme is designed for clients to
-authenticate themselves with a server.
+Notes (optional): The Signature scheme is designed for a signing entity to
+authenticate themselves with a verifying entity, and prove the integrity
+of the signed message. The Signature header can be included in either
+the HTTP request or response.
    </t>
   </section>
   <section anchor="hsa-registry" title="HTTP Signatures Algorithms Registry">
