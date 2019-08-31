@@ -1,7 +1,3 @@
-# Minimal makefile for Sphinx documentation
-#
-
-# You can set these variables from the command line.
 XML2RFCBIN    = ~/.local/bin/xml2rfc
 RFC           = draft-cavage-http-signatures
 RFCXML        = ./index.xml
@@ -11,4 +7,3 @@ html: Makefile
 
 text: Makefile
 	@$(XML2RFCBIN) --text "$(RFCXML)" -o "./$(RFC).txt"
-
