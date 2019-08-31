@@ -1,3 +1,8 @@
+branches:
+  only:
+  - gh-pages
+  - /.*/
+
 language: python
 sudo: false
 python:
