@@ -1021,9 +1021,9 @@ Authorization: Signature keyId="Test",algorithm="rsa-sha256",
   created=1402170695, expires=1402170699,
   headers="(request-target) (created) (expires)
     host date content-type digest content-length",
-  signature="vSdrb+dS3EceC9bcwHSo4MlyKS59iFIrhgYkz8+oVLEEzmYZZvRs
-    8rgOp+63LEM3v+MFHB32NfpB2bEKBIvB1q52LaEUHFv120V01IL+TAD48XaERZF
-    ukWgHoBTLMhYS2Gb51gWxpeIq8knRmPnYePbF5MOkR0Zkly4zKH7s1dE="</artwork>
+  signature="wYPEBV3SxZlf7aV/95U260Uo7oWClvvuINaJk1RtKn4TN2MasBJb/
+    jcC+YecgaK5wezC85uIaowuwc8iw+424atwnGWkoBZNjNlXrfCVUzYGvxm9+Jf
+    CiCkKaaDMt4VOZlL+nXn8p7XTGPxbeXt0JJ6oYtdLJHl2HqAcqqpb6DA="</artwork>
     </figure>
    </t>
 
@@ -1035,9 +1035,9 @@ Signature: keyId="Test",algorithm="rsa-sha256",
   created=1402170695, expires=1402170699,
   headers="(request-target) (created) (expires)
     host date content-type digest content-length",
-  signature="vSdrb+dS3EceC9bcwHSo4MlyKS59iFIrhgYkz8+oVLEEzmYZZvRs
-    8rgOp+63LEM3v+MFHB32NfpB2bEKBIvB1q52LaEUHFv120V01IL+TAD48XaERZF
-    ukWgHoBTLMhYS2Gb51gWxpeIq8knRmPnYePbF5MOkR0Zkly4zKH7s1dE="</artwork>
+  signature="wYPEBV3SxZlf7aV/95U260Uo7oWClvvuINaJk1RtKn4TN2MasBJb/
+    jcC+YecgaK5wezC85uIaowuwc8iw+424atwnGWkoBZNjNlXrfCVUzYGvxm9+Jf
+    CiCkKaaDMt4VOZlL+nXn8p7XTGPxbeXt0JJ6oYtdLJHl2HqAcqqpb6DA="</artwork>
     </figure>
    </t>
  </section>
